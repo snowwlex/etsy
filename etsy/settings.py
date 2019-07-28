@@ -39,5 +39,6 @@ EXPORT_FIELDS = [
     'number_of_admirers',
     'number_of_reviews',
     'average_review_score',
-    'date_of_last_review_left'
+    'date_of_last_review_left',
+    'number_of_items'
 ]

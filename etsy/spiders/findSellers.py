@@ -8,21 +8,28 @@ from etsy.items import EtsyItem
 class FindsellersSpider(scrapy.Spider):
     name = "findSellers"
     allowed_domains = ["etsy.com"]
-    start_urls = (
-        'https://www.etsy.com/search/shops',
-    )
+    start_urls = [
+        'https://www.etsy.com/search/shops'
+    ]
 
     def parse(self, response):
-        shops = response.css("#shop-search > div > div.shop-info.v2 > div.shop-details > span > a::attr(href)").extract()
+        shops = response.css("#shop-search div.shop")
         for shop in shops:
-            #print shop
-            yield scrapy.Request(shop,self.parseShop)
+            shop_link = shop.css('div.shop-info.v2 > div.shop-details > span > a::attr(href)').extract()[0]
+            shop_items = shop.css('.count-number::text').extract()[0]
+            yield scrapy.Request(
+                shop_link,
+                callback=self.parseShop,
+                cb_kwargs=dict(shop_items=shop_items)
+            )
             pass
-        url = response.css("#pager-next::attr(href)").extract()[0]
-        print (url)
-        yield scrapy.Request(url=url, callback=self.parse)
+        next = response.css("#pager-next::attr(href)").extract()
+        if next:
+            url = next[0]
+            print (url)
+            yield scrapy.Request(url=url, callback=self.parse)
 
-    def parseShop(self,response):
+    def parseShop(self,response, shop_items):
         name_css = ["div.content .shop-name-and-title-container > h1::text"]
         location_css = ["div.content .shop-location::text"]
         from_date_css = ["div.content .etsy-since::text"]
@@ -59,6 +66,7 @@ class FindsellersSpider(scrapy.Spider):
         # etsy['number_of_admirers'] = favourites
         etsy['number_of_reviews'] = reviews
         etsy['average_review_score'] = avg_bunch
+        etsy['number_of_items'] = shop_items
         # etsy['date_of_last_review_left'] = latest_review_regx
 
         yield etsy

@@ -19,3 +19,4 @@ class EtsyItem(scrapy.Item):
     number_of_reviews = scrapy.Field()
     average_review_score = scrapy.Field()
     date_of_last_review_left = scrapy.Field()
+    number_of_items = scrapy.Field()
