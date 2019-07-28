@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
-from etsy.spiders.Helpers import Helpers
+from etsy.spiders.Helpers import Helpers, give_me_3
 import re
 from etsy.items import EtsyItem
 
@@ -8,9 +8,8 @@ from etsy.items import EtsyItem
 class FindsellersSpider(scrapy.Spider):
     name = "findSellers"
     allowed_domains = ["etsy.com"]
-    start_urls = [
-        'https://www.etsy.com/search/shops'
-    ]
+    # start_urls = ['https://www.etsy.com/search/shops']
+    start_urls = ['https://www.etsy.com/uk/search/shops?search_query=' + l for l in list(give_me_3()) ]
 
     def parse(self, response):
         shops = response.css("#shop-search div.shop")
